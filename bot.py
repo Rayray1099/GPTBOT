@@ -41,6 +41,9 @@ async def query_openai(messages):
     async with aiohttp.ClientSession() as session:
         async with session.post(API_URL, json=payload, headers=headers) as resp:
             data = await resp.json()
+            if "choices" not in data:
+                message = data.get("error", {}).get("message", "Unexpected response")
+                raise RuntimeError(message)
             return data["choices"][0]["message"]["content"]
 
 @bot.event
